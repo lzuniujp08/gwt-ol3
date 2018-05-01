@@ -29,11 +29,11 @@ import java.util.Set;
  */
 public abstract class BaseTestCase extends GWTTestCase {
 
-    private static Set<String> loadedScriptUrls = new HashSet<>();
+    protected static Set<String> loadedScriptUrls = new HashSet<>();
 
-    private String scriptUrl;
-    private String moduleName;
-    private int testDelay;
+    protected String scriptUrl;
+    protected String moduleName;
+    protected int testDelay;
 
     /**
      * 
@@ -89,7 +89,7 @@ public abstract class BaseTestCase extends GWTTestCase {
      *
      * @return true if script was already loaded
      */
-    private boolean scriptAlreadyLoaded() {
+    protected boolean scriptAlreadyLoaded() {
         return loadedScriptUrls.contains(this.scriptUrl);
     }
 

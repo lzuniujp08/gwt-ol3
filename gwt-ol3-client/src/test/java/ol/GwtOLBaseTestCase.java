@@ -16,6 +16,12 @@
 package ol;
 
 import com.github.desjardins.gwt.junit.client.BaseTestCase;
+import com.google.gwt.core.client.Callback;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.ScriptInjector;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -24,8 +30,45 @@ import com.github.desjardins.gwt.junit.client.BaseTestCase;
  */
 public abstract class GwtOLBaseTestCase extends BaseTestCase {
 
+    private static Set<String> loadedScriptUrls = new HashSet<>();
+
     public GwtOLBaseTestCase() {
-        super("http://openlayers.org/en/v4.6.5/build/ol.js", "ol.GwtOLTest", 10000);
+        super("", "ol.GwtOLTest", 10000);
+    }
+
+    @Override
+    protected void injectUrlAndTest(TestWithInjection testWithInjection) {
+
+        if (scriptAlreadyLoaded()) {
+            testWithInjection.test();
+        } else {
+
+            this.delayTestFinish(this.testDelay);
+
+
+            ScriptInjector.fromUrl(this.getJsUrl()).setWindow(ScriptInjector.TOP_WINDOW).setCallback(new Callback<Void, Exception>() {
+
+                @Override
+                public void onFailure(Exception reason) {
+                    assertNotNull(reason);
+                    fail("Injection failed: " + reason.toString());
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                    loadedScriptUrls.add(scriptUrl);
+                    testWithInjection.test();
+                    finishTest();
+                }
+
+            }).inject();
+
+        }
+
+    }
+
+    private String getJsUrl() {
+        return GWT.getModuleBaseURL() + "ol.js";
     }
 
 }
